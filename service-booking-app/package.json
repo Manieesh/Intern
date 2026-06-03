@@ -1,0 +1,27 @@
+{
+  "name": "github.com/username/service-booking-app",
+  "private": true,
+  "description": "Full-stack MERN Local Service Booking Platform",
+  "homepage": "https://servicehub.example.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/username/service-booking-app"
+  },
+  "author": {
+    "name": "Your Name",
+    "email": "your.email@example.com"
+  },
+  "keywords": [
+    "mern",
+    "service-booking",
+    "local-services",
+    "razorpay",
+    "mongodb",
+    "react",
+    "node"
+  ],
+  "workspaces": [
+    "backend",
+    "frontend"
+  ]
+}
