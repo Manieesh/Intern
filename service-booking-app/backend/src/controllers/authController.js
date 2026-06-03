@@ -1,10 +1,11 @@
 const User = require('../models/User');
+const axios = require('axios');
 const { generateToken } = require('../utils/jwt');
 const { USER_ROLES } = require('../config/constants');
 
 const register = async (req, res) => {
   try {
-    const { name, email, password, phone, role, category } = req.body;
+    const { name, email, password, phone, role, category, city } = req.body;
 
     // Check if user exists
     let user = await User.findOne({ email });
@@ -22,6 +23,12 @@ const register = async (req, res) => {
       password,
       phone,
       role: role || USER_ROLES.CUSTOMER,
+      ...(city && {
+        address: {
+          city,
+          country: 'India'
+        }
+      }),
       ...(role === USER_ROLES.SERVICE_PROVIDER && {
         category,
         isVerified: false
@@ -100,6 +107,88 @@ const login = async (req, res) => {
   }
 };
 
+const googleLogin = async (req, res) => {
+  try {
+    const { credential, city } = req.body;
+    const googleClientId = process.env.GOOGLE_CLIENT_ID;
+
+    if (!googleClientId || googleClientId === 'your_google_oauth_client_id') {
+      return res.status(500).json({
+        success: false,
+        message: 'Google login is not configured'
+      });
+    }
+
+    if (!credential) {
+      return res.status(400).json({
+        success: false,
+        message: 'Google credential is required'
+      });
+    }
+
+    const { data: googleUser } = await axios.get('https://oauth2.googleapis.com/tokeninfo', {
+      params: { id_token: credential }
+    });
+
+    if (googleUser.aud !== googleClientId) {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid Google credential'
+      });
+    }
+
+    let user = await User.findOne({ email: googleUser.email });
+
+    if (!user) {
+      user = new User({
+        name: googleUser.name,
+        email: googleUser.email,
+        phone: 'Not provided',
+        role: USER_ROLES.CUSTOMER,
+        profileImage: googleUser.picture,
+        authProvider: 'google',
+        googleId: googleUser.sub,
+        isEmailVerified: googleUser.email_verified === 'true',
+        ...(city && {
+          address: {
+            city,
+            country: 'India'
+          }
+        })
+      });
+    } else {
+      user.authProvider = user.authProvider || 'google';
+      user.googleId = user.googleId || googleUser.sub;
+      user.profileImage = user.profileImage || googleUser.picture;
+      user.isEmailVerified = user.isEmailVerified || googleUser.email_verified === 'true';
+      if (city) {
+        user.address = {
+          ...user.address,
+          city,
+          country: user.address?.country || 'India'
+        };
+      }
+    }
+
+    await user.save();
+
+    const token = generateToken(user._id, user.role);
+
+    res.status(200).json({
+      success: true,
+      message: 'Google login successful',
+      token,
+      user: user.toJSON()
+    });
+  } catch (error) {
+    res.status(401).json({
+      success: false,
+      message: 'Google login failed',
+      error: error.message
+    });
+  }
+};
+
 const updateProfile = async (req, res) => {
   try {
     const { name, phone, address, businessName, businessDescription, experienceYears } = req.body;
@@ -168,6 +257,7 @@ const getProfile = async (req, res) => {
 module.exports = {
   register,
   login,
+  googleLogin,
   updateProfile,
   getProfile
 };

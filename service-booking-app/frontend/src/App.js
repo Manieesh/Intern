@@ -16,19 +16,30 @@ import Booking from './pages/Booking';
 import MyBookings from './pages/MyBookings';
 import AdminDashboard from './pages/AdminDashboard';
 import ProviderDashboard from './pages/ProviderDashboard';
+import Profile from './pages/Profile';
 
 // Context
 import { AuthProvider, AuthContext } from './context/AuthContext';
 
 const PrivateRoute = ({ children, requiredRole = null }) => {
-  const { isAuthenticated, user } = React.useContext(AuthContext);
+  const { isAuthenticated, user, loading } = React.useContext(AuthContext);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center bg-slate-50">
+        <div className="rounded-3xl bg-white px-8 py-6 text-center shadow-xl shadow-slate-100">
+          <p className="font-semibold text-slate-600">Loading your account...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" />;
   }
 
   if (requiredRole && user?.role !== requiredRole) {
-    return <Navigate to="/" />;
+    return <Navigate to="/home" />;
   }
 
   return children;
@@ -43,10 +54,33 @@ function App() {
           <main className="flex-grow">
             <Routes>
               {/* Public Routes */}
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Navigate to="/login" />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/services" element={<Services />} />
+              <Route
+                path="/home"
+                element={
+                  <PrivateRoute>
+                    <Home />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/services"
+                element={
+                  <PrivateRoute>
+                    <Services />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                }
+              />
 
               {/* Customer Routes */}
               <Route
@@ -87,7 +121,7 @@ function App() {
               />
 
               {/* Catch all */}
-              <Route path="*" element={<Navigate to="/" />} />
+              <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
           </main>
           <Footer />

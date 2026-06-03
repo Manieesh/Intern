@@ -78,7 +78,12 @@ const seedData = async () => {
         rating: 4.5,
         totalReviews: 25,
         isVerified: true,
-        languages: ['English', 'Hindi']
+        languages: ['English', 'Hindi'],
+        address: {
+          city: 'Chennai',
+          state: 'Tamil Nadu',
+          country: 'India'
+        }
       },
       {
         name: 'Electrician Amit',
@@ -95,7 +100,12 @@ const seedData = async () => {
         rating: 4.7,
         totalReviews: 30,
         isVerified: true,
-        languages: ['English', 'Hindi']
+        languages: ['English', 'Hindi'],
+        address: {
+          city: 'Chennai',
+          state: 'Tamil Nadu',
+          country: 'India'
+        }
       },
       {
         name: 'Carpenter Raj',
@@ -112,7 +122,12 @@ const seedData = async () => {
         rating: 4.8,
         totalReviews: 35,
         isVerified: true,
-        languages: ['English', 'Hindi', 'Marathi']
+        languages: ['English', 'Hindi', 'Marathi'],
+        address: {
+          city: 'Bengaluru',
+          state: 'Karnataka',
+          country: 'India'
+        }
       }
     ]);
 

@@ -1,6 +1,19 @@
 const Service = require('../models/Service');
 const Review = require('../models/Review');
+const User = require('../models/User');
 const { calculateRating } = require('../utils/helpers');
+
+const buildCityProviderFilter = async (city) => {
+  if (!city) return {};
+
+  const providers = await User.find({
+    role: 'provider',
+    isActive: true,
+    'address.city': { $regex: city, $options: 'i' }
+  }).select('_id');
+
+  return { providerId: { $in: providers.map((provider) => provider._id) } };
+};
 
 const createService = async (req, res) => {
   try {
@@ -58,17 +71,19 @@ const getProviderServices = async (req, res) => {
 const getServicesByCategory = async (req, res) => {
   try {
     const { category } = req.params;
-    const { page = 1, limit = 10, sortBy = 'rating' } = req.query;
+    const { page = 1, limit = 10, sortBy = 'rating', city } = req.query;
 
     const skip = (page - 1) * limit;
+    const cityFilter = await buildCityProviderFilter(city);
+    const filter = { category, isActive: true, ...cityFilter };
 
-    const services = await Service.find({ category, isActive: true })
-      .populate('providerId', 'name businessName rating rating')
+    const services = await Service.find(filter)
+      .populate('providerId', 'name businessName rating address')
       .sort({ [sortBy]: -1 })
       .skip(skip)
       .limit(parseInt(limit));
 
-    const total = await Service.countDocuments({ category, isActive: true });
+    const total = await Service.countDocuments(filter);
 
     res.status(200).json({
       success: true,
@@ -89,9 +104,9 @@ const getServicesByCategory = async (req, res) => {
 
 const searchServices = async (req, res) => {
   try {
-    const { query, category, maxPrice } = req.query;
+    const { query, category, maxPrice, city } = req.query;
 
-    let filter = { isActive: true };
+    let filter = { isActive: true, ...(await buildCityProviderFilter(city)) };
 
     if (query) {
       filter.$or = [
@@ -109,7 +124,7 @@ const searchServices = async (req, res) => {
     }
 
     const services = await Service.find(filter)
-      .populate('providerId', 'name businessName rating')
+      .populate('providerId', 'name businessName rating address')
       .sort({ rating: -1 });
 
     res.status(200).json({

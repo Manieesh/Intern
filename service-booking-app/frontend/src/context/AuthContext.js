@@ -6,12 +6,25 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  const [selectedCity, setSelectedCity] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const saveSelectedCity = (city) => {
+    const normalizedCity = city?.trim();
+    if (!normalizedCity) return;
+    setSelectedCity(normalizedCity);
+    localStorage.setItem('selectedCity', normalizedCity);
+  };
 
   const loadUserFromStorage = () => {
     try {
       const storedUser = localStorage.getItem('user');
       const storedToken = localStorage.getItem('token');
+      const storedCity = localStorage.getItem('selectedCity');
+
+      if (storedCity) {
+        setSelectedCity(storedCity);
+      }
 
       if (storedUser && storedToken) {
         setUser(JSON.parse(storedUser));
@@ -35,28 +48,50 @@ export const AuthProvider = ({ children }) => {
 
       setUser(userData);
       setToken(authToken);
+      saveSelectedCity(formData.city);
       localStorage.setItem('user', JSON.stringify(userData));
       localStorage.setItem('token', authToken);
 
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || error.message };
+      const validationError = error.response?.data?.errors?.[0]?.msg;
+      return { success: false, error: validationError || error.response?.data?.message || error.message };
     }
   };
 
-  const login = async (email, password) => {
+  const login = async (email, password, city) => {
     try {
       const response = await authAPI.login({ email, password });
       const { user: userData, token: authToken } = response.data;
 
       setUser(userData);
       setToken(authToken);
+      saveSelectedCity(city);
       localStorage.setItem('user', JSON.stringify(userData));
       localStorage.setItem('token', authToken);
 
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || error.message };
+      const validationError = error.response?.data?.errors?.[0]?.msg;
+      return { success: false, error: validationError || error.response?.data?.message || error.message };
+    }
+  };
+
+  const googleLogin = async (credential, city) => {
+    try {
+      const response = await authAPI.googleLogin(credential, city);
+      const { user: userData, token: authToken } = response.data;
+
+      setUser(userData);
+      setToken(authToken);
+      saveSelectedCity(city);
+      localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', authToken);
+
+      return { success: true, data: response.data };
+    } catch (error) {
+      const validationError = error.response?.data?.errors?.[0]?.msg;
+      return { success: false, error: validationError || error.response?.data?.message || error.message };
     }
   };
 
@@ -74,7 +109,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(response.data.user));
       return { success: true, data: response.data };
     } catch (error) {
-      return { success: false, error: error.response?.data?.message || error.message };
+      const validationError = error.response?.data?.errors?.[0]?.msg;
+      return { success: false, error: validationError || error.response?.data?.message || error.message };
     }
   };
 
@@ -82,8 +118,11 @@ export const AuthProvider = ({ children }) => {
     user,
     token,
     loading,
+    selectedCity,
+    saveSelectedCity,
     register,
     login,
+    googleLogin,
     logout,
     updateProfile,
     isAuthenticated: !!token

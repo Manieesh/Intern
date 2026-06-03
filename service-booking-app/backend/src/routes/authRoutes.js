@@ -1,6 +1,6 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { register, login, updateProfile, getProfile } = require('../controllers/authController');
+const { register, login, googleLogin, updateProfile, getProfile } = require('../controllers/authController');
 const { authenticate } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
 
@@ -28,6 +28,16 @@ router.post(
   ],
   handleValidationErrors,
   login
+);
+
+// Google Login
+router.post(
+  '/google',
+  [
+    body('credential', 'Google credential is required').notEmpty()
+  ],
+  handleValidationErrors,
+  googleLogin
 );
 
 // Get Profile
