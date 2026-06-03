@@ -386,6 +386,219 @@ const providers = [
   }
 ];
 
+const tamilNaduCities = [
+  'Ariyalur',
+  'Avadi',
+  'Chengalpattu',
+  'Chennai',
+  'Coimbatore',
+  'Cuddalore',
+  'Dharmapuri',
+  'Dindigul',
+  'Erode',
+  'Hosur',
+  'Kallakurichi',
+  'Kanchipuram',
+  'Kanyakumari',
+  'Karur',
+  'Kodaikanal',
+  'Krishnagiri',
+  'Kumbakonam',
+  'Madurai',
+  'Mayiladuthurai',
+  'Nagapattinam',
+  'Namakkal',
+  'Nagercoil',
+  'Nilgiris',
+  'Ooty',
+  'Perambalur',
+  'Pollachi',
+  'Pudukkottai',
+  'Rajapalayam',
+  'Ramanathapuram',
+  'Ranipet',
+  'Rameswaram',
+  'Salem',
+  'Sivaganga',
+  'Sivakasi',
+  'Tambaram',
+  'Tenkasi',
+  'Thanjavur',
+  'Theni',
+  'Thoothukudi',
+  'Tiruchirappalli',
+  'Tirunelveli',
+  'Tirupathur',
+  'Tiruppur',
+  'Tiruvallur',
+  'Tiruvannamalai',
+  'Tiruvarur',
+  'Vellore',
+  'Viluppuram',
+  'Virudhunagar'
+];
+
+const serviceTemplates = [
+  {
+    slug: 'electrical',
+    worker: 'Electrical Expert',
+    business: 'PowerCare Electricals',
+    category: 'electrical',
+    service: 'Electrical Repair and Installation',
+    description: 'Switchboard repair, wiring checks, lighting installation, MCB replacement, and power issue fixes.',
+    price: 699,
+    duration: 2
+  },
+  {
+    slug: 'plumbing',
+    worker: 'Plumbing Expert',
+    business: 'FlowFix Plumbing',
+    category: 'plumbing',
+    service: 'Plumbing Repair Service',
+    description: 'Leak repair, tap fitting, bathroom plumbing, drainage cleaning, and pipe replacement.',
+    price: 549,
+    duration: 2
+  },
+  {
+    slug: 'carpentry',
+    worker: 'Carpentry Expert',
+    business: 'WoodWorks Carpentry',
+    category: 'carpentry',
+    service: 'Furniture and Door Repair',
+    description: 'Door repair, furniture fitting, wardrobe work, handle replacement, and custom wood fixes.',
+    price: 749,
+    duration: 3
+  },
+  {
+    slug: 'painting',
+    worker: 'Painting Expert',
+    business: 'PrimeWall Painters',
+    category: 'painting',
+    service: 'Interior Painting Service',
+    description: 'Wall painting, touch-ups, texture finish, putty work, and room color refresh service.',
+    price: 2499,
+    duration: 1,
+    unit: 'days'
+  },
+  {
+    slug: 'cleaning',
+    worker: 'Cleaning Expert',
+    business: 'CleanNest Services',
+    category: 'cleaning',
+    service: 'Deep Home Cleaning',
+    description: 'Bathroom, kitchen, floor, window, sofa, and full home deep cleaning by trained staff.',
+    price: 1299,
+    duration: 4
+  },
+  {
+    slug: 'landscaping',
+    worker: 'Garden Expert',
+    business: 'GreenLeaf Gardening',
+    category: 'landscaping',
+    service: 'Garden Maintenance',
+    description: 'Plant care, trimming, lawn cleanup, balcony gardening, soil treatment, and garden setup.',
+    price: 999,
+    duration: 3
+  },
+  {
+    slug: 'pest-control',
+    worker: 'Pest Control Expert',
+    business: 'SafeShield Pest Control',
+    category: 'pest-control',
+    service: 'Home Pest Control',
+    description: 'Cockroach, termite, mosquito, ant, and general pest treatment for homes and shops.',
+    price: 1199,
+    duration: 2
+  },
+  {
+    slug: 'hvac',
+    worker: 'AC Technician',
+    business: 'CoolAir AC Care',
+    category: 'hvac',
+    service: 'AC Service and Installation',
+    description: 'AC cleaning, installation, cooling issue repair, gas refill inspection, and maintenance.',
+    price: 899,
+    duration: 2
+  },
+  {
+    slug: 'appliance',
+    worker: 'Appliance Technician',
+    business: 'ApplianceCare Repairs',
+    category: 'appliance-repair',
+    service: 'Home Appliance Repair',
+    description: 'TV, fridge, washing machine, oven, and common home appliance diagnosis and repair.',
+    price: 649,
+    duration: 2
+  },
+  {
+    slug: 'locksmith',
+    worker: 'Locksmith Expert',
+    business: 'SecureKey Locksmiths',
+    category: 'locksmith',
+    service: 'Lock Repair and Installation',
+    description: 'Door lock repair, smart lock setup, duplicate keys, and emergency lock assistance.',
+    price: 449,
+    duration: 1
+  }
+];
+
+const slugify = (value) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+const hourlyRatesByCategory = {
+  electrical: 150,
+  plumbing: 120,
+  carpentry: 140,
+  painting: 180,
+  cleaning: 80,
+  landscaping: 90,
+  'pest-control': 160,
+  hvac: 200,
+  'appliance-repair': 170,
+  locksmith: 100
+};
+
+const getDemoHourlyRate = (category, offset = 0) => {
+  const baseRate = hourlyRatesByCategory[category] || 100;
+  return Math.min(250, Math.max(25, baseRate + offset));
+};
+
+const generatedProviders = tamilNaduCities.flatMap((city, cityIndex) =>
+  serviceTemplates.map((template, templateIndex) => {
+    const rating = 4.4 + ((cityIndex + templateIndex) % 6) / 10;
+    const totalReviews = 18 + ((cityIndex * 7 + templateIndex * 5) % 50);
+
+    return {
+      user: {
+        name: `${city} ${template.worker}`,
+        email: `${slugify(city)}.${template.slug}@servicehub.com`,
+        password: 'password123',
+        phone: `9${String(870000000 + cityIndex * 10 + templateIndex).padStart(9, '0')}`,
+        role: USER_ROLES.SERVICE_PROVIDER,
+        businessName: `${city} ${template.business}`,
+        category: template.category,
+        experienceYears: 4 + ((cityIndex + templateIndex) % 9),
+        rating,
+        totalReviews,
+        isVerified: true,
+        address: { city, state: 'Tamil Nadu', country: 'India' }
+      },
+      services: [
+        {
+          name: template.service,
+          description: template.description,
+          category: template.category,
+          basePrice: getDemoHourlyRate(template.category, ((cityIndex + templateIndex) % 4) * 5),
+          estimatedDuration: { value: template.duration, unit: template.unit || 'hours' },
+          rating,
+          totalReviews
+        }
+      ]
+    };
+  })
+);
+
+providers.push(...generatedProviders);
+
 const ensureDemoData = async () => {
   await connectDB();
 
@@ -400,11 +613,15 @@ const ensureDemoData = async () => {
     updatedProviders += 1;
 
     for (const service of providerData.services) {
+      const normalizedService = {
+        ...service,
+        basePrice: getDemoHourlyRate(service.category)
+      };
       const result = await Service.updateOne(
-        { providerId: provider._id, name: service.name },
+        { providerId: provider._id, name: normalizedService.name },
         {
           $set: {
-            ...service,
+            ...normalizedService,
             providerId: provider._id,
             highlights: ['Verified provider', 'Transparent pricing', 'Fast booking'],
             isActive: true

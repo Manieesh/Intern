@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const { USER_ROLES } = require('../config/constants');
+const { USER_ROLES, SERVICE_CATEGORIES } = require('../config/constants');
 
 const userSchema = new mongoose.Schema(
   {
@@ -65,18 +65,7 @@ const userSchema = new mongoose.Schema(
       businessDescription: String,
       category: {
         type: String,
-        enum: [
-          'plumbing',
-          'electrical',
-          'carpentry',
-          'painting',
-          'cleaning',
-          'landscaping',
-          'pest-control',
-          'hvac',
-          'appliance-repair',
-          'locksmith'
-        ]
+        enum: SERVICE_CATEGORIES
       },
       services: [String],
       hourlyRate: Number,
@@ -91,6 +80,10 @@ const userSchema = new mongoose.Schema(
         default: 0
       },
       isVerified: {
+        type: Boolean,
+        default: false
+      },
+      isOnline: {
         type: Boolean,
         default: false
       },

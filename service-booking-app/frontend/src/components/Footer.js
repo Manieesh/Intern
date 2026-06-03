@@ -12,7 +12,14 @@ const Footer = () => {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4 mb-10">
           {/* About */}
           <div>
-            <h3 className="text-2xl font-black mb-4">ServiceHub</h3>
+            <div className="mb-4 flex items-center gap-3">
+              <img
+                src="/assets/servicehub-logo.png"
+                alt="ServiceHub logo"
+                className="h-12 w-24 object-contain"
+              />
+              <h3 className="text-2xl font-black">ServiceHub</h3>
+            </div>
             <p className="text-slate-400 leading-7">
               Your trusted platform for booking local services with verified providers.
             </p>

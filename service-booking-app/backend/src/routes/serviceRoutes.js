@@ -24,7 +24,7 @@ router.post(
     body('name', 'Service name is required').trim().notEmpty(),
     body('description', 'Service description is required').trim().notEmpty(),
     body('category', 'Service category is required').notEmpty(),
-    body('basePrice', 'Base price is required').isNumeric()
+    body('basePrice', 'Hourly rate must be between Rs 25 and Rs 250').isFloat({ min: 25, max: 250 })
   ],
   handleValidationErrors,
   createService

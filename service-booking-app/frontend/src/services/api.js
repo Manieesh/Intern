@@ -42,7 +42,8 @@ export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   googleLogin: (credential, city) => api.post('/auth/google', { credential, city }),
   getProfile: () => api.get('/auth/profile'),
-  updateProfile: (data) => api.put('/auth/profile', data)
+  updateProfile: (data) => api.put('/auth/profile', data),
+  updateProviderAvailability: (data) => api.put('/auth/provider-availability', data)
 };
 
 // Service APIs

@@ -45,11 +45,25 @@ const PrivateRoute = ({ children, requiredRole = null }) => {
   return children;
 };
 
+const HomeRoute = () => {
+  const { user } = React.useContext(AuthContext);
+
+  if (user?.role === 'provider') {
+    return <Navigate to="/provider/dashboard" replace />;
+  }
+
+  if (user?.role === 'admin') {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  return <Home />;
+};
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="flex flex-col min-h-screen">
+        <div className="servicehub-app-background flex flex-col min-h-screen">
           <Navbar />
           <main className="flex-grow">
             <Routes>
@@ -61,7 +75,7 @@ function App() {
                 path="/home"
                 element={
                   <PrivateRoute>
-                    <Home />
+                    <HomeRoute />
                   </PrivateRoute>
                 }
               />

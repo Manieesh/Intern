@@ -13,19 +13,12 @@ export const AuthProvider = ({ children }) => {
     const normalizedCity = city?.trim();
     if (!normalizedCity) return;
     setSelectedCity(normalizedCity);
-    localStorage.setItem('selectedCity', normalizedCity);
   };
 
   const loadUserFromStorage = () => {
     try {
       const storedUser = localStorage.getItem('user');
       const storedToken = localStorage.getItem('token');
-      const storedCity = localStorage.getItem('selectedCity');
-
-      if (storedCity) {
-        setSelectedCity(storedCity);
-      }
-
       if (storedUser && storedToken) {
         setUser(JSON.parse(storedUser));
         setToken(storedToken);
@@ -98,15 +91,21 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
+    setSelectedCity('');
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('selectedCity');
+  };
+
+  const saveUser = (userData) => {
+    setUser(userData);
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const updateProfile = async (data) => {
     try {
       const response = await authAPI.updateProfile(data);
-      setUser(response.data.user);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      saveUser(response.data.user);
       return { success: true, data: response.data };
     } catch (error) {
       const validationError = error.response?.data?.errors?.[0]?.msg;
@@ -124,6 +123,7 @@ export const AuthProvider = ({ children }) => {
     login,
     googleLogin,
     logout,
+    saveUser,
     updateProfile,
     isAuthenticated: !!token
   };

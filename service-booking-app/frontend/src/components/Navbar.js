@@ -8,6 +8,31 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout, isAuthenticated } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
+  const accountHomePath = user?.role === 'provider' ? '/provider/dashboard' : user?.role === 'admin' ? '/admin/dashboard' : '/home';
+  const providerDashboardPath = '/provider/dashboard?view=overview';
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const scrollToContact = () => {
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const handleHomeClick = () => {
+    setIsOpen(false);
+    navigate(accountHomePath);
+    window.setTimeout(scrollToTop, 80);
+  };
+
+  const handleContactClick = () => {
+    setIsOpen(false);
+    navigate(accountHomePath);
+    window.setTimeout(scrollToContact, 120);
+  };
 
   const handleLogout = () => {
     logout();
@@ -19,7 +44,12 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20">
           <div className="flex items-center">
-            <Link to="/home" className="flex items-center">
+            <Link to={isAuthenticated ? accountHomePath : '/login'} className="flex items-center gap-3">
+              <img
+                src="/assets/servicehub-logo.png"
+                alt="ServiceHub logo"
+                className="h-12 w-24 object-contain"
+              />
               <span className="text-2xl font-black tracking-tight text-slate-950">ServiceHub</span>
             </Link>
           </div>
@@ -28,14 +58,14 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-7">
             {isAuthenticated ? (
               <>
-                <Link to="/home" className="text-sm font-semibold text-slate-700 hover:text-teal-700">
+                <button onClick={handleHomeClick} className="text-sm font-semibold text-slate-700 hover:text-teal-700">
                   Home
-                </Link>
-                <a href="/home#contact" className="text-sm font-semibold text-slate-700 hover:text-teal-700">
+                </button>
+                <button onClick={handleContactClick} className="text-sm font-semibold text-slate-700 hover:text-teal-700">
                   Contact
-                </a>
+                </button>
                 {user?.role === 'provider' && (
-                  <Link to="/provider/dashboard" className="text-sm font-semibold text-slate-700 hover:text-teal-700">
+                  <Link to={providerDashboardPath} className="text-sm font-semibold text-slate-700 hover:text-teal-700">
                     Dashboard
                   </Link>
                 )}
@@ -91,14 +121,14 @@ const Navbar = () => {
           <div className="md:hidden pb-4 space-y-2">
             {isAuthenticated ? (
               <>
-                <Link to="/home" className="block rounded-xl px-3 py-2 font-semibold text-slate-700 hover:bg-teal-50">
+                <button onClick={handleHomeClick} className="block w-full rounded-xl px-3 py-2 text-left font-semibold text-slate-700 hover:bg-teal-50">
                   Home
-                </Link>
-                <a href="/home#contact" className="block rounded-xl px-3 py-2 font-semibold text-slate-700 hover:bg-teal-50">
+                </button>
+                <button onClick={handleContactClick} className="block w-full rounded-xl px-3 py-2 text-left font-semibold text-slate-700 hover:bg-teal-50">
                   Contact
-                </a>
+                </button>
                 {user?.role === 'provider' && (
-                  <Link to="/provider/dashboard" className="block rounded-xl px-3 py-2 font-semibold text-slate-700 hover:bg-teal-50">
+                  <Link to={providerDashboardPath} className="block rounded-xl px-3 py-2 font-semibold text-slate-700 hover:bg-teal-50">
                     Dashboard
                   </Link>
                 )}

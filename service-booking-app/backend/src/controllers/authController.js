@@ -1,7 +1,21 @@
 const User = require('../models/User');
+const Service = require('../models/Service');
 const axios = require('axios');
 const { generateToken } = require('../utils/jwt');
 const { USER_ROLES } = require('../config/constants');
+
+const normalizeHourlyRate = (value) => {
+  const rate = Number(value);
+  if (!Number.isFinite(rate) || rate <= 0) return 100;
+  return Math.min(250, Math.max(25, Math.round(rate)));
+};
+
+const formatCategoryName = (category) => {
+  return category
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+};
 
 const register = async (req, res) => {
   try {
@@ -191,7 +205,7 @@ const googleLogin = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    const { name, phone, address, businessName, businessDescription, experienceYears } = req.body;
+    const { name, phone, address, businessName, businessDescription, experienceYears, category, isOnline } = req.body;
 
     const user = await User.findById(req.user.id);
 
@@ -212,6 +226,8 @@ const updateProfile = async (req, res) => {
       if (businessName) user.businessName = businessName;
       if (businessDescription) user.businessDescription = businessDescription;
       if (experienceYears) user.experienceYears = experienceYears;
+      if (category) user.category = category;
+      if (typeof isOnline === 'boolean') user.isOnline = isOnline;
     }
 
     await user.save();
@@ -225,6 +241,103 @@ const updateProfile = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Profile update failed',
+      error: error.message
+    });
+  }
+};
+
+const updateProviderAvailability = async (req, res) => {
+  try {
+    const { isOnline, city, category, hourlyRate } = req.body;
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    if (user.role !== USER_ROLES.SERVICE_PROVIDER) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only provider accounts can go online'
+      });
+    }
+
+    if (isOnline && (!city || !category)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Select your city and job before going online'
+      });
+    }
+
+    if (typeof isOnline === 'boolean') {
+      user.isOnline = isOnline;
+    }
+
+    if (category) {
+      user.category = category;
+    }
+
+    if (city) {
+      user.address = {
+        ...(user.address?.toObject ? user.address.toObject() : user.address || {}),
+        city,
+        state: user.address?.state || 'Tamil Nadu',
+        country: user.address?.country || 'India'
+      };
+    }
+
+    let service = null;
+
+    if (isOnline) {
+      const serviceName = formatCategoryName(category);
+      const basePrice = normalizeHourlyRate(hourlyRate);
+
+      service = await Service.findOne({
+        providerId: user._id,
+        category,
+        isActive: true
+      });
+
+      if (service) {
+        service.name = service.name || serviceName;
+        service.description = service.description || `${serviceName} available in ${city}. Book this verified provider by the hour.`;
+        service.basePrice = basePrice;
+        service.estimatedDuration = service.estimatedDuration || { value: 1, unit: 'hours' };
+        service.updatedAt = Date.now();
+      } else {
+        service = new Service({
+          providerId: user._id,
+          name: serviceName,
+          description: `${serviceName} available in ${city}. Book this verified provider by the hour.`,
+          category,
+          basePrice,
+          estimatedDuration: {
+            value: 1,
+            unit: 'hours'
+          },
+          isActive: true
+        });
+      }
+
+      await service.save();
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: user.isOnline ? 'Provider is online' : 'Provider is offline',
+      user: user.toJSON(),
+      service
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update provider availability',
       error: error.message
     });
   }
@@ -259,5 +372,6 @@ module.exports = {
   login,
   googleLogin,
   updateProfile,
+  updateProviderAvailability,
   getProfile
 };

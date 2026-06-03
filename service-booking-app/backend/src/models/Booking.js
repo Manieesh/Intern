@@ -72,8 +72,23 @@ const bookingSchema = new mongoose.Schema(
       orderId: String,
       method: String
     },
+    serviceOtp: {
+      type: String,
+      required: true
+    },
+    serviceOtpVerifiedAt: Date,
     notes: String,
     cancellationReason: String,
+    cancellationCharge: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+    providerCancellationEarning: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
     cancelledAt: Date,
     completedAt: Date,
     createdAt: {
@@ -88,9 +103,9 @@ const bookingSchema = new mongoose.Schema(
   { collection: 'bookings' }
 );
 
-// Generate booking number before saving
-bookingSchema.pre('save', async function (next) {
-  if (!this.isNew) return next();
+// Generate booking number before validation so the required field is present.
+bookingSchema.pre('validate', async function (next) {
+  if (!this.isNew || this.bookingNumber) return next();
 
   const count = await mongoose.model('Booking').countDocuments();
   this.bookingNumber = `BK-${Date.now()}-${count + 1}`;

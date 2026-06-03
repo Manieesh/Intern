@@ -9,6 +9,52 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #07111f;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    linear-gradient(180deg, rgba(7, 17, 31, 0.06), rgba(7, 17, 31, 0.25)),
+    url('./assets/servicehub-background.png') center / cover no-repeat;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(245, 251, 250, 0.48);
+  backdrop-filter: blur(0.5px);
+}
+
+.servicehub-app-background main > .min-h-screen {
+  background-color: rgba(245, 251, 250, 0.68) !important;
+}
+
+.servicehub-app-background .bg-gray-50 {
+  background-color: rgba(248, 250, 252, 0.72) !important;
+}
+
+.servicehub-app-background .bg-white {
+  background-color: rgba(255, 255, 255, 0.94) !important;
+}
+
+.servicehub-app-background h1,
+.servicehub-app-background h2,
+.servicehub-app-background h3,
+.servicehub-app-background .text-slate-950 {
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.72);
+}
+
+.servicehub-app-background .text-slate-600,
+.servicehub-app-background .text-slate-700,
+.servicehub-app-background .text-gray-600,
+.servicehub-app-background .text-gray-700 {
+  color: rgb(30, 41, 59) !important;
 }
 
 code {

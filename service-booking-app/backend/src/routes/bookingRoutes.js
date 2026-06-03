@@ -45,6 +45,12 @@ router.put(
   authorize(USER_ROLES.SERVICE_PROVIDER),
   [
     body('status', 'Status is required').notEmpty()
+      .custom((status, { req }) => {
+        if (status === 'in-progress' && !req.body.serviceOtp) {
+          throw new Error('Customer OTP is required to start service');
+        }
+        return true;
+      })
   ],
   handleValidationErrors,
   updateBookingStatus

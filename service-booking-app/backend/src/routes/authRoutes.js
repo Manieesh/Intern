@@ -1,8 +1,9 @@
 const express = require('express');
 const { body } = require('express-validator');
-const { register, login, googleLogin, updateProfile, getProfile } = require('../controllers/authController');
-const { authenticate } = require('../middleware/auth');
+const { register, login, googleLogin, updateProfile, updateProviderAvailability, getProfile } = require('../controllers/authController');
+const { authenticate, authorize } = require('../middleware/auth');
 const handleValidationErrors = require('../middleware/validation');
+const { USER_ROLES } = require('../config/constants');
 
 const router = express.Router();
 
@@ -45,5 +46,8 @@ router.get('/profile', authenticate, getProfile);
 
 // Update Profile
 router.put('/profile', authenticate, updateProfile);
+
+// Update provider availability and online service
+router.put('/provider-availability', authenticate, authorize(USER_ROLES.SERVICE_PROVIDER), updateProviderAvailability);
 
 module.exports = router;

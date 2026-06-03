@@ -23,7 +23,7 @@ const createReview = async (req, res) => {
       });
     }
 
-    if (booking.customerId.toString() !== req.user.id) {
+    if (booking.customerId.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Only customer can review this booking'
@@ -150,7 +150,7 @@ const updateReview = async (req, res) => {
       });
     }
 
-    if (review.customerId.toString() !== req.user.id) {
+    if (review.customerId.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to update this review'
@@ -191,7 +191,7 @@ const deleteReview = async (req, res) => {
       });
     }
 
-    if (review.customerId.toString() !== req.user.id) {
+    if (review.customerId.toString() !== req.user.id.toString()) {
       return res.status(403).json({
         success: false,
         message: 'Not authorized to delete this review'

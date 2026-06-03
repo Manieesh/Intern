@@ -19,6 +19,12 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
 
+  const getRedirectPath = (account) => {
+    if (account?.role === USER_ROLES.SERVICE_PROVIDER) return '/provider/dashboard';
+    if (account?.role === USER_ROLES.ADMIN) return '/admin/dashboard';
+    return '/home';
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -46,7 +52,7 @@ const Register = () => {
 
       if (result.success) {
         toast.success('Registration successful!');
-        navigate('/services');
+        navigate(getRedirectPath(result.data?.user));
       } else {
         toast.error(result.error);
       }
@@ -65,7 +71,7 @@ const Register = () => {
 
       if (result.success) {
         toast.success('Google registration successful!');
-        navigate('/services');
+        navigate(getRedirectPath(result.data?.user));
       } else {
         toast.error(result.error);
       }

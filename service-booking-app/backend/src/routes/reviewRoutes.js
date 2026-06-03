@@ -21,7 +21,6 @@ router.post(
   [
     body('bookingId', 'Booking ID is required').notEmpty(),
     body('rating', 'Rating must be between 1 and 5').isInt({ min: 1, max: 5 }),
-    body('title', 'Review title is required').trim().notEmpty(),
     body('comment', 'Review comment is required').trim().notEmpty()
   ],
   handleValidationErrors,

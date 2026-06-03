@@ -14,6 +14,12 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
 
+  const getRedirectPath = (account) => {
+    if (account?.role === 'provider') return '/provider/dashboard';
+    if (account?.role === 'admin') return '/admin/dashboard';
+    return '/home';
+  };
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -30,7 +36,7 @@ const Login = () => {
 
       if (result.success) {
         toast.success('Login successful!');
-        navigate('/services');
+        navigate(getRedirectPath(result.data?.user));
       } else {
         toast.error(result.error);
       }
@@ -49,7 +55,7 @@ const Login = () => {
 
       if (result.success) {
         toast.success('Google login successful!');
-        navigate('/services');
+        navigate(getRedirectPath(result.data?.user));
       } else {
         toast.error(result.error);
       }

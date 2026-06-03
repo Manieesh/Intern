@@ -27,7 +27,8 @@ const serviceSchema = new mongoose.Schema(
     basePrice: {
       type: Number,
       required: [true, 'Please provide base price'],
-      min: [0, 'Price cannot be negative']
+      min: [25, 'Hourly rate must be at least Rs 25'],
+      max: [250, 'Hourly rate cannot exceed Rs 250']
     },
     estimatedDuration: {
       value: Number,
