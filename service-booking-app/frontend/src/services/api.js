@@ -40,7 +40,7 @@ api.interceptors.response.use(
 export const authAPI = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
-  googleLogin: (credential, city) => api.post('/auth/google', { credential, city }),
+  googleLogin: (credential, city, role) => api.post('/auth/google', { credential, city, role }),
   getProfile: () => api.get('/auth/profile'),
   updateProfile: (data) => api.put('/auth/profile', data),
   updateProviderAvailability: (data) => api.put('/auth/provider-availability', data)

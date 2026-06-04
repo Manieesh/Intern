@@ -1,13 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FiArrowRight, FiCheckCircle, FiLock, FiMail } from 'react-icons/fi';
 import { AuthContext } from '../context/AuthContext';
 import GoogleLoginButton from '../components/GoogleLoginButton';
+import { USER_ROLES } from '../config/constants';
 
 const Login = () => {
   const navigate = useNavigate();
   const { login, googleLogin } = useContext(AuthContext);
+  const selectedRole = sessionStorage.getItem('authRoleChoice');
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -19,6 +21,12 @@ const Login = () => {
     if (account?.role === 'admin') return '/admin/dashboard';
     return '/home';
   };
+
+  useEffect(() => {
+    if (![USER_ROLES.CUSTOMER, USER_ROLES.SERVICE_PROVIDER].includes(selectedRole)) {
+      navigate('/auth-choice', { replace: true });
+    }
+  }, [navigate, selectedRole]);
 
   const handleChange = (e) => {
     setFormData({
@@ -32,10 +40,16 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const result = await login(formData.email, formData.password);
+      const result = await login(formData.email, formData.password, undefined, selectedRole);
 
       if (result.success) {
+        if (selectedRole && result.data?.user?.role !== selectedRole) {
+          toast.error(`This account is not registered as a ${selectedRole === USER_ROLES.CUSTOMER ? 'customer' : 'provider'}`);
+          setLoading(false);
+          return;
+        }
         toast.success('Login successful!');
+        sessionStorage.removeItem('authRoleChoice');
         navigate(getRedirectPath(result.data?.user));
       } else {
         toast.error(result.error);
@@ -51,10 +65,16 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const result = await googleLogin(credential);
+      const result = await googleLogin(credential, undefined, selectedRole);
 
       if (result.success) {
+        if (selectedRole && result.data?.user?.role !== selectedRole) {
+          toast.error(`This Google account is not registered as a ${selectedRole === USER_ROLES.CUSTOMER ? 'customer' : 'provider'}`);
+          setLoading(false);
+          return;
+        }
         toast.success('Google login successful!');
+        sessionStorage.removeItem('authRoleChoice');
         navigate(getRedirectPath(result.data?.user));
       } else {
         toast.error(result.error);
@@ -96,7 +116,9 @@ const Login = () => {
             <div className="mb-8">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#1d7874]">Welcome back</p>
               <h2 className="mt-3 text-4xl font-black text-slate-950">Sign in</h2>
-              <p className="mt-2 text-slate-500">Access your account and continue booking trusted local services.</p>
+              <p className="mt-2 text-slate-500">
+                Signing in as {selectedRole === USER_ROLES.SERVICE_PROVIDER ? 'Provider' : 'Customer'}.
+              </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -157,9 +179,19 @@ const Login = () => {
 
             <div className="mt-8 rounded-2xl bg-slate-50 px-5 py-4 text-center text-slate-600">
               Don't have an account?{' '}
-              <Link to="/register" className="font-bold text-[#1d7874] hover:text-[#0f4c5c]">
+              <Link
+                to="/register"
+                className="inline-flex rounded-full bg-[#00BFFF] px-4 py-2 font-black text-[#07182f] shadow-md shadow-cyan-100 transition hover:bg-[#07182f] hover:text-white"
+              >
                 Create one
               </Link>
+              <button
+                type="button"
+                onClick={() => navigate('/auth-choice')}
+                className="ml-3 font-bold text-slate-500 hover:text-slate-900"
+              >
+                Change type
+              </button>
             </div>
           </div>
         </section>

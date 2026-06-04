@@ -255,11 +255,6 @@ const ProviderDashboard = () => {
   });
   const [editingServiceId, setEditingServiceId] = useState(null);
   const [serviceForm, setServiceForm] = useState(emptyServiceForm);
-  const setupSteps = [
-    { label: 'Choose city', done: !!onlineForm.city },
-    { label: 'Select job', done: !!onlineForm.category },
-    { label: 'Set hourly rate', done: !!onlineForm.hourlyRate || services.length > 0 }
-  ];
   const orderCounts = orderFilterOptions.reduce((counts, option) => {
     counts[option.key] = option.statuses.length === 0
       ? bookings.length
@@ -476,17 +471,10 @@ const ProviderDashboard = () => {
                   <p className="mt-4 max-w-xl text-slate-300">
                     Set your city, job, and hourly rate before going online. Customers in the selected city can then find and book your service.
                   </p>
-                  <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                    {setupSteps.map((step, index) => (
-                      <div key={step.label} className="rounded-2xl border border-white/10 bg-white/10 p-4 backdrop-blur">
-                        <div className={`mb-3 flex h-9 w-9 items-center justify-center rounded-full text-sm font-black ${
-                          step.done ? 'bg-teal-300 text-slate-950' : 'bg-white/10 text-slate-300'
-                        }`}>
-                          {step.done ? 'OK' : index + 1}
-                        </div>
-                        <p className="text-sm font-bold">{step.label}</p>
-                      </div>
-                    ))}
+                  <div className="mt-8 rounded-3xl border border-white/10 bg-white/10 p-6 backdrop-blur">
+                    <p className="text-3xl font-black leading-tight text-teal-200 sm:text-4xl">
+                      Show Your Skill, Grow Your Bill.
+                    </p>
                   </div>
                 </div>
               </div>

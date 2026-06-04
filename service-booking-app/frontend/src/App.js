@@ -9,6 +9,7 @@ import Footer from './components/Footer';
 
 // Pages
 import Home from './pages/Home';
+import AuthChoice from './pages/AuthChoice';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Services from './pages/Services';
@@ -45,21 +46,69 @@ const PrivateRoute = ({ children, requiredRole = null }) => {
   return children;
 };
 
+const getAuthenticatedPath = (user) => {
+  if (user?.role === 'provider') return '/provider/dashboard';
+  if (user?.role === 'admin') return '/admin/dashboard';
+  return '/home';
+};
+
+const PublicRoute = ({ children }) => {
+  const { isAuthenticated, user, loading } = React.useContext(AuthContext);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center bg-slate-50">
+        <div className="rounded-3xl bg-white px-8 py-6 text-center shadow-xl shadow-slate-100">
+          <p className="font-semibold text-slate-600">Loading your account...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to={getAuthenticatedPath(user)} replace />;
+  }
+
+  return children;
+};
+
 const HomeRoute = () => {
   const { user } = React.useContext(AuthContext);
 
-  if (user?.role === 'provider') {
-    return <Navigate to="/provider/dashboard" replace />;
-  }
-
-  if (user?.role === 'admin') {
-    return <Navigate to="/admin/dashboard" replace />;
+  if (user?.role === 'provider' || user?.role === 'admin') {
+    return <Navigate to={getAuthenticatedPath(user)} replace />;
   }
 
   return <Home />;
 };
 
+const CatchAllRoute = () => {
+  const { isAuthenticated, user } = React.useContext(AuthContext);
+  return <Navigate to={isAuthenticated ? getAuthenticatedPath(user) : '/auth-choice'} replace />;
+};
+
 function App() {
+  React.useEffect(() => {
+    const applyTheme = () => {
+      const preference = localStorage.getItem('servicehub-theme') || 'light';
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const resolvedTheme = preference === 'system' ? (systemPrefersDark ? 'dark' : 'light') : preference;
+
+      document.documentElement.dataset.theme = resolvedTheme;
+      document.documentElement.dataset.themePreference = preference;
+    };
+
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    applyTheme();
+    window.addEventListener('servicehub-theme-change', applyTheme);
+    mediaQuery.addEventListener('change', applyTheme);
+
+    return () => {
+      window.removeEventListener('servicehub-theme-change', applyTheme);
+      mediaQuery.removeEventListener('change', applyTheme);
+    };
+  }, []);
+
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -68,9 +117,38 @@ function App() {
           <main className="flex-grow">
             <Routes>
               {/* Public Routes */}
-              <Route path="/" element={<Navigate to="/login" />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
+              <Route
+                path="/"
+                element={
+                  <PublicRoute>
+                    <AuthChoice />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/auth-choice"
+                element={
+                  <PublicRoute>
+                    <AuthChoice />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <PublicRoute>
+                    <Login />
+                  </PublicRoute>
+                }
+              />
+              <Route
+                path="/register"
+                element={
+                  <PublicRoute>
+                    <Register />
+                  </PublicRoute>
+                }
+              />
               <Route
                 path="/home"
                 element={
@@ -135,7 +213,7 @@ function App() {
               />
 
               {/* Catch all */}
-              <Route path="*" element={<Navigate to="/login" />} />
+              <Route path="*" element={<CatchAllRoute />} />
             </Routes>
           </main>
           <Footer />

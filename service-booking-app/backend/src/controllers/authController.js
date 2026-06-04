@@ -70,7 +70,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
@@ -104,6 +104,13 @@ const login = async (req, res) => {
       });
     }
 
+    if ([USER_ROLES.CUSTOMER, USER_ROLES.SERVICE_PROVIDER].includes(role) && user.role !== role) {
+      return res.status(403).json({
+        success: false,
+        message: `This email is registered as a ${user.role === USER_ROLES.SERVICE_PROVIDER ? 'provider' : 'customer'} account`
+      });
+    }
+
     const token = generateToken(user._id, user.role);
 
     res.status(200).json({
@@ -123,8 +130,10 @@ const login = async (req, res) => {
 
 const googleLogin = async (req, res) => {
   try {
-    const { credential, city } = req.body;
+    const { credential, city, role } = req.body;
     const googleClientId = process.env.GOOGLE_CLIENT_ID;
+    const allowedGoogleRoles = [USER_ROLES.CUSTOMER, USER_ROLES.SERVICE_PROVIDER];
+    const requestedRole = allowedGoogleRoles.includes(role) ? role : USER_ROLES.CUSTOMER;
 
     if (!googleClientId || googleClientId === 'your_google_oauth_client_id') {
       return res.status(500).json({
@@ -158,11 +167,14 @@ const googleLogin = async (req, res) => {
         name: googleUser.name,
         email: googleUser.email,
         phone: 'Not provided',
-        role: USER_ROLES.CUSTOMER,
+        role: requestedRole,
         profileImage: googleUser.picture,
         authProvider: 'google',
         googleId: googleUser.sub,
-        isEmailVerified: googleUser.email_verified === 'true',
+        isEmailVerified: googleUser.email_verified === true || googleUser.email_verified === 'true',
+        ...(requestedRole === USER_ROLES.SERVICE_PROVIDER && {
+          isVerified: false
+        }),
         ...(city && {
           address: {
             city,
@@ -171,10 +183,17 @@ const googleLogin = async (req, res) => {
         })
       });
     } else {
+      if (user.role !== requestedRole) {
+        return res.status(400).json({
+          success: false,
+          message: `This Google account is already registered as a ${user.role === USER_ROLES.SERVICE_PROVIDER ? 'provider' : 'customer'}`
+        });
+      }
+
       user.authProvider = user.authProvider || 'google';
       user.googleId = user.googleId || googleUser.sub;
       user.profileImage = user.profileImage || googleUser.picture;
-      user.isEmailVerified = user.isEmailVerified || googleUser.email_verified === 'true';
+      user.isEmailVerified = user.isEmailVerified || googleUser.email_verified === true || googleUser.email_verified === 'true';
       if (city) {
         user.address = {
           ...user.address,

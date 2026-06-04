@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FiArrowRight, FiBriefcase, FiCheckCircle, FiLock, FiMail, FiPhone, FiUser } from 'react-icons/fi';
+import { FiArrowRight, FiCheckCircle, FiLock, FiMail, FiPhone, FiUser } from 'react-icons/fi';
 import { AuthContext } from '../context/AuthContext';
 import { USER_ROLES } from '../config/constants';
 import GoogleLoginButton from '../components/GoogleLoginButton';
@@ -9,13 +9,13 @@ import GoogleLoginButton from '../components/GoogleLoginButton';
 const Register = () => {
   const navigate = useNavigate();
   const { register, googleLogin } = useContext(AuthContext);
-  const [role, setRole] = useState(USER_ROLES.CUSTOMER);
+  const selectedRole = sessionStorage.getItem('authRoleChoice');
+  const [role, setRole] = useState(selectedRole || USER_ROLES.CUSTOMER);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    phone: '',
-    category: ''
+    phone: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -24,6 +24,15 @@ const Register = () => {
     if (account?.role === USER_ROLES.ADMIN) return '/admin/dashboard';
     return '/home';
   };
+
+  useEffect(() => {
+    if (![USER_ROLES.CUSTOMER, USER_ROLES.SERVICE_PROVIDER].includes(selectedRole)) {
+      navigate('/auth-choice', { replace: true });
+      return;
+    }
+
+    setRole(selectedRole);
+  }, [navigate, selectedRole]);
 
   const handleChange = (e) => {
     setFormData({
@@ -42,16 +51,11 @@ const Register = () => {
         role
       };
 
-      if (role === USER_ROLES.SERVICE_PROVIDER && !formData.category) {
-        toast.error('Please select a category');
-        setLoading(false);
-        return;
-      }
-
       const result = await register(registerData);
 
       if (result.success) {
         toast.success('Registration successful!');
+        sessionStorage.removeItem('authRoleChoice');
         navigate(getRedirectPath(result.data?.user));
       } else {
         toast.error(result.error);
@@ -67,10 +71,11 @@ const Register = () => {
     setLoading(true);
 
     try {
-      const result = await googleLogin(credential);
+      const result = await googleLogin(credential, undefined, role);
 
       if (result.success) {
         toast.success('Google registration successful!');
+        sessionStorage.removeItem('authRoleChoice');
         navigate(getRedirectPath(result.data?.user));
       } else {
         toast.error(result.error);
@@ -81,8 +86,6 @@ const Register = () => {
       setLoading(false);
     }
   };
-
-  const categories = ['plumbing', 'electrical', 'carpentry', 'painting', 'cleaning'];
 
   return (
     <div className="min-h-screen bg-[#f4f7fb] px-4 py-10 sm:px-6 lg:px-8">
@@ -95,24 +98,10 @@ const Register = () => {
               <p className="mt-2 text-slate-500">Join as a customer or provider and manage services in one dashboard.</p>
             </div>
 
-            <div className="mb-5 grid grid-cols-2 rounded-full bg-slate-100 p-1">
-              <button
-                type="button"
-                onClick={() => setRole(USER_ROLES.CUSTOMER)}
-                className={`rounded-full px-4 py-2 text-sm font-bold transition ${
-                  role === USER_ROLES.CUSTOMER ? 'bg-white text-[#0f4c5c] shadow-sm' : 'text-slate-500'
-                }`}
-              >
-                Customer
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole(USER_ROLES.SERVICE_PROVIDER)}
-                className={`rounded-full px-4 py-2 text-sm font-bold transition ${
-                  role === USER_ROLES.SERVICE_PROVIDER ? 'bg-white text-[#0f4c5c] shadow-sm' : 'text-slate-500'
-                }`}
-              >
-                Provider
+            <div className="mb-5 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-bold text-slate-700">
+              Creating account as {role === USER_ROLES.SERVICE_PROVIDER ? 'Provider' : 'Customer'}.
+              <button type="button" onClick={() => navigate('/auth-choice')} className="ml-2 text-[#1d7874] hover:text-[#0f4c5c]">
+                Change type
               </button>
             </div>
 
@@ -181,28 +170,6 @@ const Register = () => {
                   />
                 </div>
               </div>
-
-              {role === USER_ROLES.SERVICE_PROVIDER && (
-                <div>
-                  <label className="mb-2 block text-sm font-semibold text-slate-700">Service category</label>
-                  <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 focus-within:border-[#1d7874] focus-within:bg-white focus-within:ring-4 focus-within:ring-teal-50">
-                    <FiBriefcase className="text-slate-400" />
-                    <select
-                      name="category"
-                      value={formData.category}
-                      onChange={handleChange}
-                      className="w-full bg-transparent text-slate-900 outline-none"
-                    >
-                      <option value="">Select category</option>
-                      {categories.map((cat) => (
-                        <option key={cat} value={cat}>
-                          {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
 
               <button
                 type="submit"

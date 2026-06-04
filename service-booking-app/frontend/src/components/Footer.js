@@ -1,15 +1,11 @@
-import React, { useContext } from 'react';
-import { Link } from 'react-router-dom';
+import React from 'react';
 import { FiGithub, FiLinkedin, FiMail, FiPhone } from 'react-icons/fi';
-import { AuthContext } from '../context/AuthContext';
 
 const Footer = () => {
-  const { isAuthenticated } = useContext(AuthContext);
-
   return (
     <footer id="contact" className="bg-slate-950 text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-4 mb-10">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-3 mb-10">
           {/* About */}
           <div>
             <div className="mb-4 flex items-center gap-3">
@@ -21,7 +17,7 @@ const Footer = () => {
               <h3 className="text-2xl font-black">ServiceHub</h3>
             </div>
             <p className="text-slate-400 leading-7">
-              Your trusted platform for booking local services with verified providers.
+              Connecting customers with trusted local professionals for fast, reliable, and hassle-free services.
             </p>
             <div className="mt-5 space-y-3 text-slate-300">
               <a href="mailto:manieeshkumar@karunya.edu.in" className="flex items-center gap-2 hover:text-white">
@@ -39,35 +35,11 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-bold mb-4">About Us</h4>
             <ul className="space-y-3 text-slate-400">
-              {isAuthenticated ? (
-                <>
-                  <li><a href="/home#home" className="hover:text-white">Home</a></li>
-                  <li><a href="/home#contact" className="hover:text-white">Contact</a></li>
-                </>
-              ) : (
-                <>
-                  <li><Link to="/login" className="hover:text-white">Login</Link></li>
-                  <li><Link to="/register" className="hover:text-white">Register</Link></li>
-                </>
-              )}
-            </ul>
-          </div>
-
-          {/* Categories */}
-          <div>
-            <h4 className="text-lg font-bold mb-4">Services</h4>
-            <ul className="space-y-3 text-slate-400">
-              {isAuthenticated ? (
-                <>
-                  <li><Link to="/services?category=plumbing" className="hover:text-white">Plumbing</Link></li>
-                  <li><Link to="/services?category=electrical" className="hover:text-white">Electrical</Link></li>
-                  <li><Link to="/services?category=cleaning" className="hover:text-white">House Cleaning</Link></li>
-                  <li><Link to="/services?category=photographer" className="hover:text-white">Photography</Link></li>
-                  <li><Link to="/services?category=hvac" className="hover:text-white">AC Repair</Link></li>
-                </>
-              ) : (
-                <li className="leading-7">Login to explore services available in your city.</li>
-              )}
+              <li>Trusted Professionals</li>
+              <li>Verified Experts</li>
+              <li>Reliable Services</li>
+              <li>Quality Assurance</li>
+              <li>Customer Satisfaction</li>
             </ul>
           </div>
 
@@ -86,8 +58,8 @@ const Footer = () => {
               </a>
             </div>
             <div className="mt-6 space-y-3 text-slate-400">
-              <Link to="/" className="block hover:text-white">Privacy Policy</Link>
-              <Link to="/" className="block hover:text-white">Terms & Conditions</Link>
+              <span className="block">Privacy Policy</span>
+              <span className="block">Terms & Conditions</span>
             </div>
           </div>
         </div>

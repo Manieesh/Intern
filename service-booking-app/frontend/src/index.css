@@ -9,52 +9,158 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #07111f;
+  background: #f8fbff;
 }
 
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -2;
-  background:
-    linear-gradient(180deg, rgba(7, 17, 31, 0.06), rgba(7, 17, 31, 0.25)),
-    url('./assets/servicehub-background.png') center / cover no-repeat;
-}
-
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background: rgba(245, 251, 250, 0.48);
-  backdrop-filter: blur(0.5px);
+html[data-theme='dark'] body {
+  background: #07182f;
+  color: #e5eefb;
+  color-scheme: dark;
 }
 
 .servicehub-app-background main > .min-h-screen {
-  background-color: rgba(245, 251, 250, 0.68) !important;
+  background-color: #f8fbff !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background main > .min-h-screen {
+  background-color: #07182f !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .bg-\[\#f4f7fb\],
+html[data-theme='dark'] .servicehub-app-background .bg-\[\#f5fbfa\],
+html[data-theme='dark'] .servicehub-app-background .bg-\[\#f8fbff\] {
+  background-color: #07182f !important;
 }
 
 .servicehub-app-background .bg-gray-50 {
-  background-color: rgba(248, 250, 252, 0.72) !important;
+  background-color: #f8fafc !important;
 }
 
 .servicehub-app-background .bg-white {
-  background-color: rgba(255, 255, 255, 0.94) !important;
+  background-color: #ffffff !important;
 }
 
-.servicehub-app-background h1,
-.servicehub-app-background h2,
-.servicehub-app-background h3,
-.servicehub-app-background .text-slate-950 {
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.72);
+html[data-theme='dark'] .servicehub-app-background .bg-white,
+html[data-theme='dark'] .servicehub-app-background .bg-slate-50,
+html[data-theme='dark'] .servicehub-app-background .bg-gray-50 {
+  background-color: #0f213d !important;
 }
 
-.servicehub-app-background .text-slate-600,
-.servicehub-app-background .text-slate-700,
-.servicehub-app-background .text-gray-600,
-.servicehub-app-background .text-gray-700 {
-  color: rgb(30, 41, 59) !important;
+html[data-theme='dark'] .servicehub-app-background .bg-slate-100,
+html[data-theme='dark'] .servicehub-app-background .bg-gray-100,
+html[data-theme='dark'] .servicehub-app-background .bg-slate-200,
+html[data-theme='dark'] .servicehub-app-background .bg-gray-200 {
+  background-color: #172b4d !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .bg-slate-950,
+html[data-theme='dark'] .servicehub-app-background .bg-\[\#07182f\] {
+  background-color: #061326 !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .bg-\[\#00BFFF\] {
+  background-color: #38cfff !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .bg-\[\#00BFFF\] .text-\[\#07182f\],
+html[data-theme='dark'] .servicehub-app-background .bg-\[\#00BFFF\].text-\[\#07182f\] {
+  color: #07182f !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .text-slate-950,
+html[data-theme='dark'] .servicehub-app-background .text-slate-900,
+html[data-theme='dark'] .servicehub-app-background .text-gray-900,
+html[data-theme='dark'] .servicehub-app-background .text-black {
+  color: #f8fbff !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .text-slate-800,
+html[data-theme='dark'] .servicehub-app-background .text-slate-700,
+html[data-theme='dark'] .servicehub-app-background .text-gray-700 {
+  color: #dbe7f6 !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .text-slate-600,
+html[data-theme='dark'] .servicehub-app-background .text-slate-500,
+html[data-theme='dark'] .servicehub-app-background .text-slate-400,
+html[data-theme='dark'] .servicehub-app-background .text-gray-600,
+html[data-theme='dark'] .servicehub-app-background .text-gray-500,
+html[data-theme='dark'] .servicehub-app-background .text-gray-400 {
+  color: #9fb1c8 !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .text-\[\#07182f\],
+html[data-theme='dark'] .servicehub-app-background .text-\[\#0f4c5c\] {
+  color: #eaf6ff !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .text-\[\#00BFFF\],
+html[data-theme='dark'] .servicehub-app-background .text-\[\#007eaa\],
+html[data-theme='dark'] .servicehub-app-background .text-\[\#1d7874\],
+html[data-theme='dark'] .servicehub-app-background .text-teal-700,
+html[data-theme='dark'] .servicehub-app-background .text-teal-600,
+html[data-theme='dark'] .servicehub-app-background .text-cyan-700,
+html[data-theme='dark'] .servicehub-app-background .text-blue-700 {
+  color: #7de3ff !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .border-slate-100,
+html[data-theme='dark'] .servicehub-app-background .border-slate-200,
+html[data-theme='dark'] .servicehub-app-background .border-slate-300,
+html[data-theme='dark'] .servicehub-app-background .border-gray-100,
+html[data-theme='dark'] .servicehub-app-background .border-gray-200,
+html[data-theme='dark'] .servicehub-app-background .border-gray-300 {
+  border-color: #223a5f !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background input,
+html[data-theme='dark'] .servicehub-app-background select,
+html[data-theme='dark'] .servicehub-app-background textarea {
+  background-color: #12233e !important;
+  border-color: #2a4268 !important;
+  color: #f8fbff !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background input::placeholder,
+html[data-theme='dark'] .servicehub-app-background textarea::placeholder {
+  color: #8fa3bd !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background option {
+  background-color: #12233e;
+  color: #f8fbff;
+}
+
+html[data-theme='dark'] .servicehub-app-background table,
+html[data-theme='dark'] .servicehub-app-background thead,
+html[data-theme='dark'] .servicehub-app-background tbody,
+html[data-theme='dark'] .servicehub-app-background tr {
+  background-color: #0f213d !important;
+  color: #e5eefb !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background th,
+html[data-theme='dark'] .servicehub-app-background td {
+  border-color: #223a5f !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .shadow-slate-100,
+html[data-theme='dark'] .servicehub-app-background .shadow-slate-200,
+html[data-theme='dark'] .servicehub-app-background .shadow-teal-50,
+html[data-theme='dark'] .servicehub-app-background .shadow-cyan-100,
+html[data-theme='dark'] .servicehub-app-background .shadow-red-100 {
+  --tw-shadow-color: rgba(0, 0, 0, 0.35) !important;
+  --tw-shadow: var(--tw-shadow-colored) !important;
+}
+
+html[data-theme='dark'] .servicehub-app-background .ring-teal-50,
+html[data-theme='dark'] .servicehub-app-background .ring-cyan-50 {
+  --tw-ring-color: rgba(125, 227, 255, 0.22) !important;
+}
+
+html[data-theme='dark'] .Toastify__toast {
+  background: #0f213d;
+  color: #f8fbff;
 }
 
 code {

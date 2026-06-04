@@ -52,9 +52,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password, city) => {
+  const login = async (email, password, city, role) => {
     try {
-      const response = await authAPI.login({ email, password });
+      const response = await authAPI.login({ email, password, role });
       const { user: userData, token: authToken } = response.data;
 
       setUser(userData);
@@ -70,9 +70,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const googleLogin = async (credential, city) => {
+  const googleLogin = async (credential, city, role) => {
     try {
-      const response = await authAPI.googleLogin(credential, city);
+      const response = await authAPI.googleLogin(credential, city, role);
       const { user: userData, token: authToken } = response.data;
 
       setUser(userData);
